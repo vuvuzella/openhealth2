@@ -15,6 +15,9 @@ take a while especially angularjs.
 
 ### Building the mobileangular app
 
+NOTE: Before building, make sure all required platforms and plugins have been installed first. 
+See Plugins and Platform sections below
+
 'gulp build' will just build the latest javascript files from 'src'
 folder and output them in 'www' folder.
 
@@ -38,6 +41,13 @@ This is for android 4.4+ only
 Install the following cordova plugins:
 * cordova-plugin-sms
 * custom url scheme
+
+### Platforms
+To install on an android emulator or test phone, do
+
+'cordova platform add android'
+
+before compdiling with 'cordova build' or run...
 
 ### TODO:
 * Make this code to be Service-Oriented Architecture, wherein 
