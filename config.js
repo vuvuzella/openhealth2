@@ -124,6 +124,7 @@ module.exports = function(config) {
    */
 
    // config.vendor.js.push('.bower_components/mylib/mylib.js');
+   config.vendor.js.push('.plugins/cordova-plugin-sms/www/SMS.js');
 
   /**
    * Vendor Fonts
