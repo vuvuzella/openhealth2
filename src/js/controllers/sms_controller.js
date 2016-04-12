@@ -32,12 +32,16 @@ angular.module('Openhealth.controllers.SMS',
       });
 
       var smsList = [];
+      var filters = {
+        indexFrom : 0,  // just to be sure to start from 0
+        maxCount  : 999 // plugin default is 10
+      };
 
       setTimeout(function() {
 
         deviceReady(function() {
           if (typeof(SMS) != 'undefined') {
-            SMS.listSMS({}, function(data) {
+            SMS.listSMS(filters, function(data) {
               var sms = '';
               if (Array.isArray(data)) {
                 for (var index in data) {
@@ -124,6 +128,7 @@ angular.module('Openhealth.controllers.SMS',
       });
     }
 
+    // function variable for removeEventListener
     var removeListener = function() {
       alert('SMS Listener removed!');
       console.log('SMS Listener removed');
@@ -149,6 +154,10 @@ angular.module('Openhealth.controllers.SMS',
           alert('SMS module not loaded');
         }
       });
+    }
+
+    // enableIntercept
+    $scope.toggleIntercept = function() {
     }
 
 }]);
