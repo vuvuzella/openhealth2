@@ -11,7 +11,11 @@ take a while especially angularjs.
 'npm install' to install gulp dependencies
 
 1. 'bower install'
-2. npm install
+2. 'npm install'
+3. 'gulp build'
+4. Add a platform. See Platform below
+5. Add Plugins. See Plugins below
+6. 'cordova build' or 'cordova run <platform>'
 
 ### Building the mobileangular app
 
