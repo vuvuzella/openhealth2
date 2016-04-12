@@ -83,7 +83,7 @@ angular.module('Openhealth.controllers.SMS',
       setTimeout(function() {
         deviceReady(function() {
 
-          if (typeof(SMS) != 'defined') {
+          if (typeof(SMS) != 'undefined') {
             console.log('sending message');
             SMS.sendSMS(mobileNo, strMsg,
               function() {
@@ -97,6 +97,58 @@ angular.module('Openhealth.controllers.SMS',
       }, 2000);
 
       return deferred.promise;
+    }
+
+    // startWatch()
+    $scope.smsListen = function() {
+      console.log('openHealth: Entering smsListen()');
+      deviceReady(function() {
+
+        if (typeof(SMS) != 'undefined') {
+          SMS.startWatch(function() {
+            console.log('Now listening for incoming SMS...');
+            alert('Now listening for incoming SMS...');
+            document.addEventListener('onSMSArrive', function(){
+              alert('SMS Received!');
+              console.log('SMS Received!');
+            });
+          },
+          function() {
+            console.log('Failed to start listening');
+            alert('Failed to start listening');
+          });
+        } else {
+          console.log('SMS module not loaded');
+          alert('SMS module not loaded');
+        }
+      });
+    }
+
+    var removeListener = function() {
+      alert('SMS Listener removed!');
+      console.log('SMS Listener removed');
+    }
+
+    // stopWatch()
+    $scope.smsStop = function() {
+      console.log('openHealth: Entering smsStop()');
+      deviceReady(function() {
+
+        if (typeof(SMS) != 'undefined') {
+          SMS.stopWatch(function() {
+            console.log('Stopped listening for incoming SMS...');
+            alert('Stoppped listening for incoming SMS...');
+            document.removeEventListener('onSMSArrive', removeListener);
+          },
+          function() {
+            console.log('Failed to stop listening');
+            alert('Failed to stop listening');
+          });
+        } else {
+          console.log('SMS module not loaded');
+          alert('SMS module not loaded');
+        }
+      });
     }
 
 }]);

@@ -25,6 +25,12 @@ angular.module('Openhealth', [
         templateUrl:'inbox.html',  
         reloadOnSearch: false
     });
+  $routeProvider.when('/listen', 
+    {
+        controller: 'SMSController',  
+        templateUrl:'listen.html',  
+        reloadOnSearch: false
+    });
 
 
 });
