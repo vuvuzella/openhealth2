@@ -20,6 +20,7 @@ angular.module('Openhealth.controllers.SMS',
 
     // getSMS()
     // Async - Retrieves the messages from the inbox of the phone
+    // TODO: Accept only messages with correct filters?
     $scope.getSMS = function() {
       console.log('openHealth: Entering listSMS()');
       var deferred = $q.defer();
@@ -104,6 +105,9 @@ angular.module('Openhealth.controllers.SMS',
     }
 
     // startWatch()
+    $scope.toggleListen = false;
+    var KWORD = 'medapp';
+    var KEYWORDLENGTH = KWORD.length;
     $scope.smsListen = function() {
       console.log('openHealth: Entering smsListen()');
       deviceReady(function() {
@@ -112,9 +116,34 @@ angular.module('Openhealth.controllers.SMS',
           SMS.startWatch(function() {
             console.log('Now listening for incoming SMS...');
             alert('Now listening for incoming SMS...');
-            document.addEventListener('onSMSArrive', function(){
+            $scope.toggleListen = true;
+            document.addEventListener('onSMSArrive', function(receivedSMS){
               alert('SMS Received!');
               console.log('SMS Received!');
+              // console.log('typeof data is ' + typeof(receivedSMS.data));
+              // console.log('typeof receivedMsg is ' + typeof(receivedSMS));
+              // add processing of sms
+              // If it has the keywords, add to list
+              // else restore and give to other SMS apps
+              var smsData = receivedSMS.data;
+              var dataList = [];
+              dataList.push(smsData);
+              var keyword = smsData.body.substr(0, KEYWORDLENGTH); // get the first three 
+              console.log('keyword is ' + keyword);
+
+              if (KWORD.localeCompare(keyword) == 0) {
+                // process the body after the keyword.
+                // entry for other services
+                console.log('keyword accepted.');
+                console.log('Body of the message is ' + 
+                  smsData.body.substr(KEYWORDLENGTH + 1, smsData.body.length));
+              } else {
+                // restore SMS message for other apps to process
+                console.log('Received message does not contain a keyword');
+                // restoreSMS(receivedSMS);
+                restoreSMS(dataList);
+              }
+
             });
           },
           function() {
@@ -143,6 +172,7 @@ angular.module('Openhealth.controllers.SMS',
           SMS.stopWatch(function() {
             console.log('Stopped listening for incoming SMS...');
             alert('Stoppped listening for incoming SMS...');
+            $scope.toggleListen = false;
             document.removeEventListener('onSMSArrive', removeListener);
           },
           function() {
@@ -156,8 +186,77 @@ angular.module('Openhealth.controllers.SMS',
       });
     }
 
-    // enableIntercept
-    $scope.toggleIntercept = function() {
+    // startIntercept
+    $scope.startIntercept = function() {
+      if ($scope.toggleListen != true) {
+        console.log('Cannot start intercepting, not listening to SMS');
+        return;
+      }
+      console.log('openHealth: Entering startIntercept()');
+
+      deviceReady(function() {
+        if (typeof(SMS) != 'undefined') {
+          SMS.enableIntercept(true,
+            function() {
+              console.log('Start intercepting messages');
+              alert('Start intercepting messages');
+            },
+            function() {
+              console.log('Failed to start intercepting');
+              alert('Failed to start intercepting');
+            });
+          
+        } else {
+          console.log('SMS module not loaded');
+          alert('SMS module not loaded');
+        }
+      });
+    }
+    
+    // startIntercept
+    $scope.stopIntercept = function() {
+      console.log('openHealth: Entering stopIntercept()');
+
+      deviceReady(function() {
+        if (typeof(SMS) != 'undefined') {
+          SMS.stopWatch(function() {
+            console.log('Stopeed intercepting messages');
+            alert('Stopeed intercepting messages');
+          },
+          function() {
+            console.log('Failed to stop intercepting messages');
+            alert('Failed to stop intercepting messages');
+          });
+        } else {
+          console.log('SMS module not loaded');
+          alert('SMS module not loaded');
+        }
+      });
     }
 
+    // restoreSMS()
+    // restore intercepted messages back to the inbox
+    // messageList MUST be a list of receivedSMS.data objects
+    // By default, no phone notification is done. Add ringing notification
+    var restoreSMS = function(messageList) {
+      console.log('openHealth: Entering restoreSMS()');
+      deviceReady(function() {
+        if (typeof(SMS) != 'undefined') {
+          SMS.restoreSMS(messageList,
+            function(numOfRestoredMsg) {
+              // Do message clean up
+              alert('Successfully restored' + numOfRestoredMsg +
+                ' messages!' );
+              console.log('Restoring ' + numOfRestoredMsg + 'sms message');
+            },
+            function(err) {
+              alert('Error in restoring sms messge: ' + err);
+              console.log('Error in restoring sms messge: ' + err);
+            });
+        } else {
+          console.log('SMS module not loaded');
+          alert('SMS module not loaded');
+        }
+      });
+    }
 }]);
